@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+	<title> Pulsar Timing Calculator </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width", initial-scale=1">
+
+	<style>
+	body {background-color: rgba(128,0,0,1);}
+	p {colr:black;}
+	.box1 { 
+		background-color: rgba(255,255,255,.3);
+		width: 300px;
+		//height: 100px;
+		margin: 15px;
+		padding: 15px;
+		border: 15px;
+	}
+	.box2 {
+		background-color: rgba(255,255,255,1);
+		width: 300px;
+		height: 100px;
+		margin: 25px;
+		padding: 25px;
+		border: 25px;
+	}
+	.boxwrapper {
+		width: 800px;
+		margin: 25px;
+		padding: 25px;
+		border: 25px;	
+	}
+	header {
+	background-color: rgba(250,230,140,1);
+	padding: 10px;
+	text-align: center;
+	font-size: 35px;
+	color:white;
+	}
+	</style>
+
+	<script language="javascript" type="text/javascript">
+		function Calculate() {
+		var Mass=parseFloat(document.getElementById("Input_Mass").value);	
+		var Velocity=parseFloat(document.getElementById("Input_Velocity").value);
+		var result= .5 * Mass * Math.pow(Velocity, 2);
+		document.getElementById("Answer").innerHTML="The energy of your particle is "+result;
+		}
+	</script>
+	<script language="javascript" type="text/javascript">
+		var input = document.getElementById("TestValue");
+		input.addEventListener("keyup", function(event) {
+			event.preventDefault();
+			if (event.keyCode === 13) {
+				document.getElementById("Calc1").click();
+			}
+		});	
+	</script>		
+	</head>
+
+	<body>
+	<nav class="w3-bar w3-black">
+		<a href="#home" class="w3-button w3-bar-item">Home</a>
+	</nav>
+	<header>
+		<h2>Pulsar Timing Calculator</h2>
+	</header>
+	<p> This is some html/css/js to get started on Drew and Liam's thesis project. Woooooo </p>
+
+		<div class="box1">	
+			<h2>Input the mass of your particle!</h2>
+			<tr>
+				<td><input type="text" name"Input_Mass" size="40", id="Input_Mass"></td>
+			</tr>
+		</div>
+
+		<div class="box1">
+			<h2>Input the velocity of your particle!</h2>
+			<tr>
+                                <td><input type="text" name"Input_Velocity" size="40", id="Input_Velocity"></td>
+                        </tr>	
+		</div>
+		<div class="box1">
+			<h2 id="Answer"></h2>
+			<tr>
+				<td><button id= "Calcall" onclick="Calculate()">Calculate Energy</button></td>
+			</tr>
+		</div>
+
+	</body>
+</html>
