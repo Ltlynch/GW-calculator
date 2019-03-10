@@ -1,3 +1,40 @@
-This is a test
-This is a second test
+The home page should start with a banner across the top with the name of the website: "GRAVITATIONAL WAVE CALCULATOR".
+
+Across the left had side of the screen we want our various parameters. This may be a ways down the road, but we would like the boxes for each parameter to be able to autofill when the necessary other boxes are filled. I think this is something on Liam's end, but essentially: If someone puts in: Mass 1 and Mass 2, it should autofill the Total Mass and Mass Ratio (its just basic math of adding the two for Total Mass, and dividing them for the ratio). 
+
+I think at the moment we are just calculating the gravitational wave strain, so just below the parameters there should be a button saying: "Calculate Gravitational Wave Strain"
+
+These parameters should fill up majority of the page since that is mostly what we want it to say.
+
+The "Calculate Gravitational Wave Strain" button should prompt a response to be filled into its corresponding box, but it should also pull up a note in the middle of the page that discusses what the Strain they got means. This specific content should be formatted in the following form:
+
+If (x < ___A___ nm):
+    Then Return "A strain of this size is likely to be too small to be realistically detectable by Pulsar Timing in the forseeable future."
+
+
+Elif (__A___nm < x < ___B___ nm) :
+    Then Return "A strain of this size would not be detectable by Pulsar Timing Array at this time. According to _____, Pulsar Timing should have refined their limits to be able to make a detection from this source within ____ years. Please note that this will be limited based on where this source is. See our Pulsar Maps* (if this can be a hyperlink to maps that woudld be best) for more information."
+
+Elif (__B___nm < x < __C___nm):
+    Then Return "A strain of this size should be within the limits of Pulsar Timing Array to make a detection from this source. Please note that this will be limited based on where this source is. See our Pulsar Maps* (if this can be a hyperlink to the maps page that woudld be best) for more information."
+
+Else (so greater than __C___ nm):
+    Then Return "A strain of this size would not be detectable by Pulsar Timing Array at this time. This would more likely be detectable using LIGO* or LISA* (with links to their pages)."
+
+At the bottom of the page should be the buttons that take them to the other pages on our web site:
+
+We should have "Home", "Try Me - 3c66b source", "Try Me - Hypothetical Desireable Source", "Current Pulsar Maps", "Contact us", "How to Cite"
+
+"Home" should be restoring them to the home page
+
+"Try Me - 3c66b source" should be autofilling in the 3c66b input
+
+"Try Me - Hypothertical Desireable Source" should be autofilling in the second set of input information
+
+"Current Pulsar Maps" should take them to the page with the maps that Sarah Vigeland created and Liam is coding up.
+
+"About us" should take them to a page with a link to NanoGrav and a brief description that I can write up later about Liam, myself, Andrea, and any other collaborators that we work with. It will probably have Andrea's email for questions just since Liam and I will sadly not be involved outside this year.
+
+"How to Cite" should just bring up a little box with an APA citation for our page.
+
 
