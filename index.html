@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+<body>
+
+<form onsubmit="return false;">
+
+  <fieldset>
+    <legend>Mass</legend>
+    <p>
+      <label>M<sub>1</sub></label>
+      <input type="text" id="m1" name="m1" placeholder="1e9" pattern="[+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?"> M<sub>&#9737;</sub>
+      <br>
+      <small>Use scientific notation. The letter e is used to mean "10 to the power of." For example, 1.316e2 means 1.316 * 10<sup>2</sup> which is 131.6.</small>
+    </p>
+    <p>
+    <label>M<sub>2</sub></label>
+      <input type="text" id="m2" name="m2" placeholder="1e9" pattern="[+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?"> M<sub>&#9737;</sub>
+    </p>
+    <p>
+      <label>Ratio (q)</label>
+      <input type="number" id="m_ratio" name="m_ratio" placeholder="1.00" min="0" max="1" step="0.01">
+    </p>
+    <p>
+      <label>Total Mass</label>
+      <input type="text" id="total_m" name="total_m" placeholder="2e9" pattern="[+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?"> M<sub>&#9737;</sub>
+    </p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Parameters</legend>
+    <p>
+      <label>Distance</label>
+      <input type="number" id="distance" name="distance" placeholder="100.00" step="0.01"> Mpc
+      <button id="redshiftcalc">Get Redshift</button>
+      <br>
+      <label>Redshift (z)*</label>
+      <input type="number" id="redshift" name="redshift" step="0.0001" placeholder="0.0237" min="0" max="10"> z (years)
+      <button id="distancecalc">Get Distance</button>
+      <br>
+      <small>*Calculated assuming a Hubble constant of 70 km s<sup>-1</sup> Mpc<sup>-1</sup></small>
+    </p>
+    <p>
+      <label>Position RA</label>
+      <input type="text" id="position_ra" name="position_ra" placeholder="20h14m40.00s" pattern="\d{1,10}h\d{1,10}m[\d.]{1,100}s">
+      <br>
+      <label>Position Dec</label>
+      <input type="number" id="position_dec" name="position_dec" placeholder="80.00" min="0" max="360" step="0.01"> degrees
+    </p>
+    <p>
+      <label>Orbital Period</label>
+      <input type="number" id="orbital_p" name="orbital_p" placeholder="400.00" step="0.01" min="0"> years
+      <button id="orbitalsepcalc">Get Orbital Separation</button>
+      <br>
+      <label>Orbital Separation</label>
+      <input type="number" id="orbital_s" name="orbital_s" placeholder="10.00" step="0.01" min="0"> pc
+      <button id="orbitalpercalc">Get Orbital Period</button>
+      <br>
+      <button id="totalmasscalc">Get Total Mass from Orbital data</button>
+    </p>
+		<p>
+			<label>Orbital Inclination</label>
+			<input type="number" id="orbital_i" name="orbital_i" placeholder="0.00" step="0.01" min="0"> degrees
+			<br>
+			<label>Orbital Eccentricity</label>
+			<input type="number" id="orbital_e" name="orbital_e" placeholder="0.00" step="0.01" min="0"> 
+		</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Results</legend>
+    <p><button id="submit">Calculate!</button></p>
+    <p>Residual Signature: <input type="text" id="result_rs" name="result_rs" disabled>&#956;s</p>
+    <p>Detection Signifigance: <input type="text" id="result_ds" name="result_ds" disabled>%</p>
+  </fieldset>
+
+</form>
+
+<script>
+var submit = document.getElementById('submit');
+submit.addEventListener('click', submitVars, false);
+
+function submitVars() {
+  document.getElementById("result_rs").value = 'Calculating...';
+
+  var m1 = document.getElementById('m1').value;
+  var m2 = document.getElementById('m2').value;
+  var total_m = document.getElementById('total_m').value;
+  var m_ratio = document.getElementById('m_ratio').value;
+  var distance = document.getElementById('distance').value
+  var redshift = document.getElementById('redshift').value 
+  var orbital_p = document.getElementById('orbital_p').value;
+  var orbital_s = document.getElementById('orbital_s').value;
+  var orbital_i = document.getElementById('orbital_i').value;
+  var orbital_e = document.getElementById('orbital_e').value;
+  //var position_ra = document.getElementById('position_ra').value;
+  //var position_dec = document.getElementById('position_dec').value;
+	var url = 'calculate.py?action=calculate' + 
+    '&m1=' + m1 + '&m2=' + m2 + '&distance=' + distance + '&redshift=' + redshift + '&total_m=' + total_m + '&m_ratio=' + m_ratio + '&orbital_p=' + orbital_p + '&orbital_s=' + orbital_s + '&orbital_i=' + orbital_i + '&orbital_e=' + orbital_e; //+ '&position_ra=' + position_ra + '&position_dec' + position_dec;
+
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      showVars(this);
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.send();
+}
+
+function showVars(xhttp) {
+  var r = xhttp.response;
+  r = JSON.parse(r);
+  console.log(r);
+  document.getElementById("result_rs").value = r.result_rs;
+  document.getElementById("result_ds").value = r.result_ds;
+}
+
+//redshift to distance
+var redshiftcalcBtn = document.getElementById('redshiftcalc');
+redshiftcalcBtn.addEventListener('click', redshiftcalc, false);
+function redshiftcalc() {
+  var distance = document.getElementById('distance').value;
+  var vars = 'action=redshiftcalc&distance='+distance;
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      showCalcRedshift(this);
+    }
+  };
+  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.send();
+}
+function showCalcRedshift(xhttp) {
+  var r = xhttp.response;
+  r = JSON.parse(r);
+  console.log(r);
+  document.getElementById("redshift").value = r.redshift;
+}
+
+//distance to redshift
+var distancecalcBtn = document.getElementById('distancecalc');
+distancecalcBtn.addEventListener('click', distancecalc, false);
+function distancecalc() {
+  var redshift = document.getElementById('redshift').value;
+  var vars = 'action=distancecalc&redshift='+redshift;
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      showCalcDistance(this);
+    }
+  };
+  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.send();  
+}
+function showCalcDistance(xhttp) {
+  var r = xhttp.response;
+  r = JSON.parse(r);
+  console.log(r);
+  document.getElementById("distance").value = r.distance;
+}
+
+//orbital separation from period
+var orbitalsepcalcBtn = document.getElementById('orbitalsepcalc');
+orbitalsepcalcBtn.addEventListener('click', orbitalsepcalc, false);
+function orbitalsepcalc() {
+  var orbital_p = document.getElementById('orbital_p').value;
+  var total_m = document.getElementById('total_m').value;
+  var vars = 'action=orbitalsepcalc&orbital_p='+orbital_p+'&total_m='+total_m;
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      showCalcOS(this);
+    }
+  };
+  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.send();  
+}
+function showCalcOS(xhttp) {
+  var r = xhttp.response;
+  r = JSON.parse(r);
+  console.log(r);
+  document.getElementById("orbital_s").value = r.orbital_s;
+}
+//orbital period from separation
+var orbitalpercalcBtn = document.getElementById('orbitalpercalc');
+orbitalpercalcBtn.addEventListener('click', orbitalpercalc, false);
+function orbitalpercalc() {
+  var orbital_s = document.getElementById('orbital_s').value;
+  var total_m = document.getElementById('total_m').value;
+  var vars = 'action=orbitalpercalc&orbital_s='+orbital_s+'&total_m='+total_m;
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      showCalcOP(this);
+    }
+  };
+  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.send();  
+}
+function showCalcOP(xhttp) {
+  var r = xhttp.response;
+  r = JSON.parse(r);
+  console.log(r);
+  document.getElementById("orbital_p").value = r.orbital_p;
+}
+//total mass from both orbital period/separation
+var totalmasscalcBtn = document.getElementById('totalmasscalc');
+totalmasscalcBtn.addEventListener('click', totalmasscalc, false);
+function totalmasscalc() {
+  var orbital_s = document.getElementById('orbital_s').value;
+  var orbital_p = document.getElementById('orbital_p').value;
+  var vars = 'action=totalmasscalc&orbital_s='+orbital_s+'&orbital_p='+orbital_p;
+  var xhttp;
+  xhttp=new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      showCalcTM(this);
+    }
+  };
+  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.send();  
+}
+function showCalcTM(xhttp) {
+  var r = xhttp.response;
+  r = JSON.parse(r);
+  r = Number(r.total_m).toExponential();
+  r = r.replace('e+','e');
+  console.log(r);
+  document.getElementById("total_m").value = r;
+}
+</script>
+</body>
+</html>
