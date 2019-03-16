@@ -41,15 +41,16 @@ try:
         return M0*1.98847e30
 
     if action == 'redshiftcalc':
-    	
+
         H0 = 70
         distance = float(form.getfirst("distance",""))
-        redshift = (distance*H0)/const.c
+        redshift = round((distance*H0)/(const.c*1e-3), 4) # const.c is in meters, converting to km
+
 
         print(json.dumps({'redshift':redshift}))
 
     elif action == 'distancecalc':
-    	
+
         redshift = float(form.getfirst("redshift",""))
         distance = WMAP5.comoving_distance(redshift)	
 
@@ -91,10 +92,11 @@ try:
         orbital_s = float(form.getfirst("orbital_s",""))
         orbital_i = float(form.getfirst("orbital_i",""))
         orbital_e = float(form.getfirst("orbital_e",""))
-        position_ra = float(form.getfirst("position_ra",""))
+        #TODO figure out how to parse the RAJ string and convert it into phi
+        position_ra = form.getfirst("position_ra","")
         position_dec = float(form.getfirst("position_dec",""))
 
-        result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance)
+        result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2)
 
         data = np.genfromtxt('11yr_skymap_v4.txt', names=True)	    
         nside = 8
