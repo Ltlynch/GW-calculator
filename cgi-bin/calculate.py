@@ -108,7 +108,6 @@ try:
 
 
         result_ds = 56.3  # This last thing is not quite done yet. The last thing to do it to connect the ul_value above, with the residual signature in order to produce a detection probability.
-
         print(json.dumps({'result_rs':result_rs,'result_ds':result_ds}))
 except:
     print("Content-Type: text/html")

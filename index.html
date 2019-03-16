@@ -98,7 +98,7 @@ function submitVars() {
   var orbital_e = document.getElementById('orbital_e').value;
   //var position_ra = document.getElementById('position_ra').value;
   //var position_dec = document.getElementById('position_dec').value;
-	var url = 'calculate.py?action=calculate' + 
+	var url = 'cgi-bin/calculate.py?action=calculate' + 
     '&m1=' + m1 + '&m2=' + m2 + '&distance=' + distance + '&redshift=' + redshift + '&total_m=' + total_m + '&m_ratio=' + m_ratio + '&orbital_p=' + orbital_p + '&orbital_s=' + orbital_s + '&orbital_i=' + orbital_i + '&orbital_e=' + orbital_e; //+ '&position_ra=' + position_ra + '&position_dec' + position_dec;
 
   var xhttp;
@@ -133,7 +133,7 @@ function redshiftcalc() {
       showCalcRedshift(this);
     }
   };
-  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.open('GET', 'cgi-bin/calculate.py?' + vars, true);
   xhttp.send();
 }
 function showCalcRedshift(xhttp) {
@@ -156,7 +156,7 @@ function distancecalc() {
       showCalcDistance(this);
     }
   };
-  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.open('GET', 'cgi-bin/calculate.py?' + vars, true);
   xhttp.send();  
 }
 function showCalcDistance(xhttp) {
@@ -180,7 +180,7 @@ function orbitalsepcalc() {
       showCalcOS(this);
     }
   };
-  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.open('GET', 'cgi-bin/calculate.py?' + vars, true);
   xhttp.send();  
 }
 function showCalcOS(xhttp) {
@@ -203,7 +203,7 @@ function orbitalpercalc() {
       showCalcOP(this);
     }
   };
-  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.open('GET', 'cgi-bin/calculate.py?' + vars, true);
   xhttp.send();  
 }
 function showCalcOP(xhttp) {
@@ -226,7 +226,7 @@ function totalmasscalc() {
       showCalcTM(this);
     }
   };
-  xhttp.open('GET', 'calculate.py?' + vars, true);
+  xhttp.open('GET', 'cgi-bin/calculate.py?' + vars, true);
   xhttp.send();  
 }
 function showCalcTM(xhttp) {
