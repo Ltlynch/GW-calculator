@@ -7,6 +7,7 @@ import json
 import numpy as np
 import scipy.constants as const
 import healpy as hp
+from astropy.coordinates import SkyCoord
 from astropy.cosmology import WMAP5
 
 sys.stderr = sys.stdout
@@ -18,6 +19,7 @@ try:
     form = cgi.FieldStorage()
 
     print("Content-Type: application/json")
+    print("Access-Control-Allow-Origin: *")
     print("")
 
     action = form.getfirst("action","calculate")
@@ -52,7 +54,9 @@ try:
     elif action == 'distancecalc':
 
         redshift = float(form.getfirst("redshift",""))
-        distance = WMAP5.comoving_distance(redshift)	
+        #distance = WMAP5.comoving_distance(redshift)	
+        H0 = 70
+        distance = round((redshift*const.c*1e-3)/H0 ,2)
 
         print(json.dumps({'distance':distance}))
 
@@ -60,7 +64,7 @@ try:
 
         orbital_p = float(form.getfirst("orbital_p",""))
         total_m = float(form.getfirst("total_m",""))
-        orbital_s = s_to_yrs(np.sqrt((4 * (const.pi**2) * (pc_to_m(orbital_s)/2)**3)/(const.G * M0_to_kg(total_m))))
+        orbital_s = 2*np.cbrt((const.G * M0_to_kg(total_m) * yrs_to_s(orbital_p)**2)/(4*(const.pi)**2))
 
         print(json.dumps({'orbital_s':orbital_s}))
 
@@ -68,7 +72,7 @@ try:
 
         orbital_s = float(form.getfirst("orbital_s",""))
         total_m = float(form.getfirst("total_m",""))
-        orbital_p = 2*np.cbrt((const.G * M0_to_kg(total_m) * yrs_to_s(orbital_p)**2)/(4*(const.pi)**2))
+        orbital_p = s_to_yrs(np.sqrt((4 * (const.pi**2) * (pc_to_m(orbital_s)/2)**3)/(const.G * M0_to_kg(total_m))))
 
         print(json.dumps({'orbital_p':orbital_p}))
 
@@ -94,13 +98,22 @@ try:
         orbital_e = float(form.getfirst("orbital_e",""))
         #TODO figure out how to parse the RAJ string and convert it into phi
         position_ra = form.getfirst("position_ra","")
-        position_dec = float(form.getfirst("position_dec",""))
-
+        position_dec = form.getfirst("position_dec","")
+        
+        #hours, minutes = position_dec.split('.')
+        #dec_hours = '+{0}d{1}m'.format(hours, minutes)
+        
+        #coords = SkyCoord(position_ra, dec_hours, frame = 'icrs')
+        
+        RA_hours = position_ra.replace('h',',').replace('m',',').replace('s', ',').split(',')
+        phi = float(position_dec)
+        theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
+        
         result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2)
-
+	
         data = np.genfromtxt('11yr_skymap_v4.txt', names=True)	    
         nside = 8
-        npix = hp.nside2pix(nside)
+        npix = hp.nside2npix(nside)
         indices = hp.ang2pix(nside, data['theta'], data['phi'])
         skymap = np.zeros(npix, dtype=np.float)
         skymap[indices] += data['ul'][indices]
@@ -108,7 +121,7 @@ try:
 
 
         result_ds = 56.3  # This last thing is not quite done yet. The last thing to do it to connect the ul_value above, with the residual signature in order to produce a detection probability.
-        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds}))
+        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'phi': phi, 'theta': theta}))
 except:
     print("Content-Type: text/html")
     print("")  

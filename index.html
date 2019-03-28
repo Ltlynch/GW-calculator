@@ -61,13 +61,13 @@
       <br>
       <button id="totalmasscalc">Get Total Mass from Orbital data</button>
     </p>
-		<p>
-			<label>Orbital Inclination</label>
-			<input type="number" id="orbital_i" name="orbital_i" placeholder="0.00" step="0.01" min="0"> degrees
-			<br>
-			<label>Orbital Eccentricity</label>
-			<input type="number" id="orbital_e" name="orbital_e" placeholder="0.00" step="0.01" min="0"> 
-		</p>
+    <p>
+      <label>Orbital Inclination</label>
+      <input type="number" id="orbital_i" name="orbital_i" placeholder="0.00" step="0.01" min="0"> degrees
+      <br>
+      <label>Orbital Eccentricity</label>
+      <input type="number" id="orbital_e" name="orbital_e" placeholder="0.00" step="0.01" min="0"> 
+    </p>
   </fieldset>
 
   <fieldset>
@@ -96,10 +96,10 @@ function submitVars() {
   var orbital_s = document.getElementById('orbital_s').value;
   var orbital_i = document.getElementById('orbital_i').value;
   var orbital_e = document.getElementById('orbital_e').value;
-  //var position_ra = document.getElementById('position_ra').value;
-  //var position_dec = document.getElementById('position_dec').value;
+  var position_ra = document.getElementById('position_ra').value;
+  var position_dec = document.getElementById('position_dec').value;
 	var url = 'cgi-bin/calculate.py?action=calculate' + 
-    '&m1=' + m1 + '&m2=' + m2 + '&distance=' + distance + '&redshift=' + redshift + '&total_m=' + total_m + '&m_ratio=' + m_ratio + '&orbital_p=' + orbital_p + '&orbital_s=' + orbital_s + '&orbital_i=' + orbital_i + '&orbital_e=' + orbital_e; //+ '&position_ra=' + position_ra + '&position_dec' + position_dec;
+    '&m1=' + m1 + '&m2=' + m2 + '&distance=' + distance + '&redshift=' + redshift + '&total_m=' + total_m + '&m_ratio=' + m_ratio + '&orbital_p=' + orbital_p + '&orbital_s=' + orbital_s + '&orbital_i=' + orbital_i + '&orbital_e=' + orbital_e + '&position_ra=' + position_ra + '&position_dec=' + position_dec;
 
   var xhttp;
   xhttp=new XMLHttpRequest();
