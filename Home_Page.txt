@@ -6,20 +6,11 @@ I think at the moment we are just calculating the gravitational wave strain, so 
 
 These parameters should fill up majority of the page since that is mostly what we want it to say.
 
-The "Calculate Gravitational Wave Strain" button should prompt a response to be filled into its corresponding box, but it should also pull up a note in the middle of the page that discusses what the Strain they got means. This specific content should be formatted in the following form:
+The "Calculate Gravitational Wave Strain" button should prompt a response to be filled into its corresponding box, but it should also pull up a note in the middle of the page that discusses what the Strain they got means. This specific content should be read:
 
-If (x < ___A___ nm):
-    Then Return "A strain of this size is likely to be too small to be realistically detectable by Pulsar Timing in the forseeable future."
+"The typical residual effect for the black hole binary you've entered is _____. Typical residual precision in the PTA is currently around 100ns, and in the future we expect it to be as low as 10ns. If your number is very far below these, it is unlikely to be detectable by Pulsar Timing Array in the near future. Please also see the graphical output that shows probability of detection given the particular location of the black hole binary on the sky."
 
-
-Elif (__A___nm < x < ___B___ nm) :
-    Then Return "A strain of this size would not be detectable by Pulsar Timing Array at this time. According to _____, Pulsar Timing should have refined their limits to be able to make a detection from this source within ____ years. Please note that this will be limited based on where this source is. See our Pulsar Maps* (if this can be a hyperlink to maps that woudld be best) for more information."
-
-Elif (__B___nm < x < __C___nm):
-    Then Return "A strain of this size should be within the limits of Pulsar Timing Array to make a detection from this source. Please note that this will be limited based on where this source is. See our Pulsar Maps* (if this can be a hyperlink to the maps page that woudld be best) for more information."
-
-Else (so greater than __C___ nm):
-    Then Return "A strain of this size would not be detectable by Pulsar Timing Array at this time. This would more likely be detectable using LIGO* or LISA* (with links to their pages)."
+There will be an accompanying graph that is outputed with this result.
 
 At the bottom of the page should be the buttons that take them to the other pages on our web site:
 
