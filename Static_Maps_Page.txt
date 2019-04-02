@@ -1,0 +1,17 @@
+Liam will add in the three maps:
+
+At the top of the page we would like it to say:
+
+"The following are three different maps the sky to various limits. In areas of the sky that are denser with pulsars, pulsar timing array is able to get more precise results when attempting to measure Gravitational Waves from Supermassive Black Hole Binarys. The upper limit confidence means that on each map we are confident to the degree noted that we would be able to detect anything below our current upper limit.* These maps were generated based on the current data within the pulsar timing array."
+
+
+Next to the first map should read:
+"95% Upper Limit Confidence"
+
+The second map:
+"75% Upper Limit Confidence"
+
+The third:
+"50% Upper Limit Confidence"
+
+There should also be a key that Liam will provide
