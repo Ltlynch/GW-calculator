@@ -2,16 +2,18 @@ Liam will add in the three maps:
 
 At the top of the page we would like it to say:
 
-"The following are three different maps the sky to various limits. In areas of the sky that are denser with pulsars, pulsar timing array is able to get more precise results when attempting to measure Gravitational Waves from Supermassive Black Hole Binarys. The upper limit confidence means that on each map we are confident to the degree noted that we would be able to detect anything below our current upper limit.* These maps were generated based on the current data within the pulsar timing array."
+"The following are three different maps of the sky displaying the current pulsar timing array's (PTA's) ability to detect a source of the strain shown by the color. In areas of the sky that are denser with pulsars, the PTA is able to detect
+smaller strains.  Each map corresponds to a specific frequency and probability, specifically the probability that a source of that strain
+would be detected by the current data set.  So notice that as the probability decreases, the strain also decreases.
+The maps displayed here are  a subset of the maps used to calculate the probability of detection in the calculator. 
+These maps were generated based on the current data within the pulsar timing array and are provided by Sarah Vigeland, Joe Simon, and Bense. For more information on how they were created, please see _____(need citation here.)
 
 
 Next to the first map should read:
-"95% Upper Limit Confidence"
+"95% Probability of Detection for a frequency of ______"
 
 The second map:
-"75% Upper Limit Confidence"
+"75% Probability of Detection for a frequency of ______"
 
 The third:
-"50% Upper Limit Confidence"
-
-There should also be a key that Liam will provide
+"50% Probability of Detection for a frequency of ______"
