@@ -1,7 +1,11 @@
 Photo of the Liam, Drew, and Andrea?
 
-"Hello and thank you for making use of our Gravitational Wave Calculator. 
+Thank you for making use of our Gravitational Wave Calculator! 
 
-Liam Lynch and Drew Evans are members of the undergraduate class of 2019 at Haverford College. They helped prepare this page as part of their Senior Thesis. Evans focussed heavily on making the page as accessible as possible to any user regardless of background with Gravitational Waves and Pulsar Timing. Lynch's own research aided in his focus on creating the maps and calculations the page was intended for.
+Liam Lynch and Drew Evans are members of the undergraduate class of 2019 at Haverford College. They did the backend programming to prepare this page as part of their Senior Thesis. Evans focussed heavily on making the page as accessible as possible to any user regardless of background with Gravitational Waves and Pulsar Timing. Lynch's own research aided in his focus on creating the maps and calculations the page was intended for.
 
-They were advised by Andrea Lommen, who received her Ph.D. in Astrophysics from UC Berkeley. She currently conducts her research with the Pulsar Timing Array through the Neutron Star Interior Composition ExploreR (NICER) and prevously helped start the NANOGRAV research group."
+They were advised by Haverford Professor Andrea Lommen, who received her Ph.D. in Astrophysics from UC Berkeley. She currently conducts her research with the Pulsar Timing Array through the Neutron Star Interior Composition ExploreR (NICER) and is one of the founders of both the North American Nanohertz Observatory of Gravitational Waves (see NANOGrav.org) and the International Pulsar Timing Array (see IPTA4gw.org.) For more on Lommen's research group please see https://www.haverford.edu/users/alommen.)
+
+We want to thank Sarah Vigeland and Joseph Simon for all their help in obtaining the data necessary for this website. Their work with NANOGRAV can be found here.
+
+We also want to thank David Zimmerman and Chad McComsey of Mind Development & Design for their design work, without whom the site wouldn't be functional, and certainly wouldn't have been so pleasing.
