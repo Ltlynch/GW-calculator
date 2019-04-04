@@ -109,7 +109,7 @@ try:
         phi = float(position_dec)
         theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
         
-        result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2)
+        result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
 	
         data = np.genfromtxt('11yr_skymap_v4.txt', names=True)	    
         nside = 8
