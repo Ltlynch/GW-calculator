@@ -2,18 +2,21 @@ Liam will add in the three maps:
 
 At the top of the page we would like it to say:
 
-"The following are three different maps of the sky displaying the current pulsar timing array's (PTA's) ability to detect a source of the strain shown by the color. In areas of the sky that are denser with pulsars, the PTA is able to detect
-smaller strains.  Each map corresponds to a specific frequency and probability, specifically the probability that a source of that strain
-would be detected by the current data set.  So notice that as the probability decreases, the strain also decreases.
+"The following are three different maps of the sky displaying the current pulsar timing array's (PTA's) strain upper limit as a function of sky position.
+In areas of the sky that are denser with pulsars, the PTA is able to limit
+smaller strains.  Each map corresponds to a specific frequency and confidence 
+level, specifically the confidence with which we can say that a source of that strain
+does not exist.
+So notice that as the confidence decreases, the strain also decreases.
 The maps displayed here are  a subset of the maps used to calculate the probability of detection in the calculator. 
-These maps were generated based on the current data within the pulsar timing array and are provided by Sarah Vigeland, Joe Simon, and Bense. For more information on how they were created, please see _____(need citation here.)
+These maps were generated based on the current data within the pulsar timing array and are provided by Sarah Vigeland, Joe Simon. For more information on how they were created, please see https://arxiv.org/pdf/1812.11585.pdf.
 
 
 Next to the first map should read:
-"95% Probability of Detection for a frequency of ______"
+"95% Confidence Upper Limit for a frequency of ______"
 
 The second map:
-"75% Probability of Detection for a frequency of ______"
+"75% Confidence Upper Limit for a frequency of ______"
 
 The third:
-"50% Probability of Detection for a frequency of ______"
+"50% Confidence Upper Limit for a frequency of ______"
