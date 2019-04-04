@@ -9,6 +9,7 @@ import scipy.constants as const
 import healpy as hp
 from astropy.coordinates import SkyCoord
 from astropy.cosmology import WMAP5
+#from skymap_class import Skymap
 
 sys.stderr = sys.stdout
 cgitb.enable()
@@ -111,16 +112,94 @@ try:
         
         result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
 	
-        data = np.genfromtxt('11yr_skymap_v4.txt', names=True)	    
-        nside = 8
-        npix = hp.nside2npix(nside)
-        indices = hp.ang2pix(nside, data['theta'], data['phi'])
-        skymap = np.zeros(npix, dtype=np.float)
-        skymap[indices] += data['ul'][indices]
-        ul_value = hp.pixelfunc.get_interp_val(skymap, theta, phi)
+        class skymap:
+            def __init__(self, ulfile, pixelfile):
+                assert(type(ulfile) == str and type(pixelfile) == str)
+                assert(os.path.isfile(ulfile) and os.path.isfile(pixelfile))
+                
+                ul = np.loadtxt(ulfile)i
+                pixel = np.genfromtxt(pixelfile, names = True)
+                
+                self.theta = pixel['theta']
+                self.phi = pixel['phi']
+                
+                self.map_dictionary = {}
+                self.map_dictionary[95] = self.create_map(ul[:,1])
+                self.map_dictionary[75] = self.create_map(ul[:,2])
+                self.map_dictionary[50] = self.create_map(ul[:,3])
+                self.map_dictionary[25] = self.create_map(ul[:,4])
+                self.map_dictionary[1] = self.create_map(ul[:,5])
+            
+            def create_map(self, ulcolumn):
+                npix = len(self.theta)
+                nside = hp.npix2nside(npix)
+                indices = hp.ang2pix(nside, self.theta, self.phi)
+                skymap = np.zeros(npix, dtype=np.float)
+                skymap[indices] += ulcolumn[indices]
+                return skymap
+            
+            def interpolate(self, conf, theta, phi):
+                if conf == 'all':
+                    maps = []
+                    for value in self.map_dictionary.values():
+                        maps.append(hp.pixelfunc.get_interp_val(value, theta, phi))
+                    return maps
+                else:
+                    return hp.pixelfunc.get_interp_val(self.map_dictionary[conf], theta, phi)
+            
+            def plot(self, confidence):
+                hp.mollview(np.log10(self.map_dictionary[confidence]), title= 'Upper Limit Skymap')
+        skymap3nHz = skymap('uls_smoothed_3nHz.txt', 'skymap_pixels.txt')
+        skymap10nHz = skymap('uls_smoothed_10nHz.txt', 'skymap_pixels.txt')
+        skymap31nHz = skymap('uls_smoothed_31nHz.txt','skymap_pixels.txt')
+        skymap100nHz = skymap('uls_smoothed_100nHz.txt','skymap_pixels.txt')
+        skymap318nHz = skymap('uls_smoothed_318nHz.txt','skymap_pixels.txt')
+
+        interp3nHz= np.array(skymap3nHz.interpolate('all', input_theta, input_phi))
+        interp10nHz = np.array(skymap10nHz.interpolate('all', input_theta, input_phi))
+        interp31nHz = np.array(skymap31nHz.interpolate('all', input_theta, input_phi))
+        interp100nHz = np.array(skymap100nHz.interpolate('all', input_theta, input_phi))
+        interp318nHz = np.array(skymap318nHz.interpolate('all', input_theta, input_phi))
+
+        combined_columns = np.array([interp3nHz, interp10nHz, interp31nHz, interp100nHz, interp318nHz])
+
+        #print(interp3nHz)
+        #print(interp10nHz)
+
+        #f = np.concatenate((interp1, interp2), axis=1)
+
+        freq_array = np.array([3e-9, 10e-9, 31e-9, 100e-9, 318e-9])
+        #print(interp1)
+        #print(freq_array)
+
+        row1 = np.array(combined_columns[:,0])
+        row25 = np.array(combined_columns[:,1])
+        row50 = np.array(combined_columns[:,2])
+        row75 = np.array(combined_columns[:,3])
+        row95 = np.array(combined_columns[:,4])
+
+        combined_rows = np.array([row1, row25, row50, row75, row95])
+
+        #freq_interp = interp1d(freq_array, combined)
+        freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic')
+        freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic')
+        freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic')
+        freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic')
+        freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic')
+
+        # = np.array([freq_interp1(input_freq), freq_interp2(input_freq), freq_interp3(input_freq), freq_interp4(input_freq), freq_interp5(input_freq)])
 
 
-        result_ds = 56.3  # This last thing is not quite done yet. The last thing to do it to connect the ul_value above, with the residual signature in order to produce a detection probability.
+        confidence_array = [1, 25, 50, 75, 95]
+        orbital_f = 1/(orbital_p*365*24*3600)
+        new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
+
+        #print(new_freq_rows)
+
+        conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
+
+        result_ds = round(float(conf_interp(5e-15)), 4)
+
         print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'phi': phi, 'theta': theta}))
 except:
     print("Content-Type: text/html")
