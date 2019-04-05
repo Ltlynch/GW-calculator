@@ -4,4 +4,26 @@ We also want to thank David Zimmerman and Chad McComsey of Mind Development & De
 
 References:
 
-Liam's references here*
+Aggarwal, K., Arzoumanian, Z., Baker, P. T., Brazier, A., Brinson, M. R., Brook, P. R., … Zhu, W. W. (2018). The nanograv 11-year data set: limits on gravitational waves from individual supermassive black hole binaries. ArXiv:1812.11585 [Astro-Ph, Physics:Gr-Qc]. Retrieved from http://arxiv.org/abs/1812.11585
+
+Babak, S., Petiteau, A., Sesana, A., Brem, P., Rosado, P. A., Taylor, S. R., … Verbiest, J. P. W. (2016). European Pulsar Timing Array limits on continuous gravitational waves from individual supermassive black hole binaries. Monthly Notices of the Royal Astronomical Society, 455(2), 1665–1679. https://doi.org/10.1093/mnras/stv2092
+
+Burt, B. J., Lommen, A. N., & Finn, L. S. (2011). Optimizing pulsar timing arrays to maximize gravitational wave single-source detection: a first cut. The Astrophysical Journal, 730(1), 17. https://doi.org/10.1088/0004-637X/730/1/17
+
+Ellis, J. A., Siemens, X., & Creighton, J. D. E. (2012). Optimal strategies for continuous gravitational wave detection in pulsar timing arrays. The Astrophysical Journal, 756(2), 175. https://doi.org/10.1088/0004-637X/756/2/175
+
+Hogg, D. W. (1999). Distance measures in cosmology. ArXiv:Astro-Ph/9905116. Retrieved from http://arxiv.org/abs/astro-ph/9905116
+
+Jenet, F. A., Lommen, A., Larson, S. L., & Wen, L. (2004). Constraining the properties of supermassive black hole systems using pulsar timing: application to 3c 66b. The Astrophysical Journal, 606(2), 799–803. https://doi.org/10.1086/383020
+
+Lee, K. J., Wex, N., Kramer, M., Stappers, B. W., Bassa, C. G., Janssen, G. H., … Smits, R. (2011). Gravitational wave astronomy of single sources with a pulsar timing array: GW astronomy of single sources. Monthly Notices of the Royal Astronomical Society, 414(4), 3251–3264. https://doi.org/10.1111/j.1365-2966.2011.18622.x
+
+Lommen, A. N., & Backer, D. C. (2001). Using pulsars to detect massive black hole binaries via gravitational radiation: sagittarius a* and nearby galaxies. The Astrophysical Journal, 562(1), 297–302. https://doi.org/10.1086/323491
+
+Ray, P. S., Wood, K. S., & Wolff, M. T. (2017). Characterization of pulsar sources for x-ray navigation. ArXiv:1711.08507 [Astro-Ph]. Retrieved from http://arxiv.org/abs/1711.08507
+
+Sudou, H., Iguchi, S., Murata, Y., & Taniguchi, Y. (2003). Orbital motion in the radio galaxy 3c 66b: evidence for a supermassive black hole binary. Science, 300(5623), 1263–1265. https://doi.org/10.1126/science.1082817
+
+Taylor, S. R., Huerta, E. A., Gair, J. R., & McWilliams, S. T. (2016). Detecting eccentric supermassive black hole binaries with pulsar timing arrays: Resolvable source strategies. The Astrophysical Journal, 817(1), 70. https://doi.org/10.3847/0004-637X/817/1/70
+
+Yonemaru, N., Kumamoto, H., Kuroyanagi, S., Takahashi, K., & Silk, J. (2016). Gravitational waves from an SMBH binary in M87. Publications of the Astronomical Society of Japan, 68(6), 106. https://doi.org/10.1093/pasj/psw100
