@@ -9,3 +9,7 @@ They were advised by Haverford Professor Andrea Lommen, who received her Ph.D. i
 We want to thank Sarah Vigeland and Joseph Simon for all their help in obtaining the data necessary for this website. Their work with NANOGRAV can be found here.
 
 We also want to thank David Zimmerman and Chad McComsey of Mind Development & Design for their design work, without whom the site wouldn't be functional, and certainly wouldn't have been so pleasing.
+
+
+If you use this page, please cite it as follows. Thanks!
+Evans, A., Lommen, A., & Lynch, L. (2019). Gravitational Wave Calculator [Web Tool]. Retrieved from https://www.gravcalc.org
