@@ -1,9 +1,8 @@
-We want to thank Sarah Vigeland and Joseph Simon for all their help in obtaining the data necessary for this website. Their work with NANOGRAV can be found here (hyperlink to: nanograv.org). 
+Citations:
+Here is how to cite this tool:
+Evans, A., Lommen, A., & Lynch, L. (2019). Gravitational Wave Calculator [Web Tool]. Retrieved from https://www.gravcalc.org
 
-We also want to thank David Zimmerman and Chad McComsey of Mind Development & Design for their assistance in creating the website.
-
-References:
-
+Papers used in creating the tool:
 Aggarwal, K., Arzoumanian, Z., Baker, P. T., Brazier, A., Brinson, M. R., Brook, P. R., … Zhu, W. W. (2018). The nanograv 11-year data set: limits on gravitational waves from individual supermassive black hole binaries. ArXiv:1812.11585 [Astro-Ph, Physics:Gr-Qc]. Retrieved from http://arxiv.org/abs/1812.11585
 
 Babak, S., Petiteau, A., Sesana, A., Brem, P., Rosado, P. A., Taylor, S. R., … Verbiest, J. P. W. (2016). European Pulsar Timing Array limits on continuous gravitational waves from individual supermassive black hole binaries. Monthly Notices of the Royal Astronomical Society, 455(2), 1665–1679. https://doi.org/10.1093/mnras/stv2092

@@ -7,7 +7,7 @@ In areas of the sky that are denser with pulsars, the PTA is able to limit
 smaller strains.  Each map corresponds to a specific frequency and confidence 
 level, specifically the confidence with which we can say that a source of that strain
 does not exist.
-So notice that as the confidence decreases, the strain also decreases.
+So notice that as the confidence decreases, the strain also decreases. In other words, it's more difficult to rule out smaller sources and smaller strains.
 The maps displayed here are  a subset of the maps used to calculate the probability of detection in the calculator. 
 These maps were generated based on the current data within the pulsar timing array and are provided by Sarah Vigeland, Joe Simon. For more information on how they were created, please see https://arxiv.org/pdf/1812.11585.pdf.
 

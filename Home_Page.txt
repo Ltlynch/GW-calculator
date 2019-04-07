@@ -8,9 +8,10 @@ These parameters should fill up majority of the page since that is mostly what w
 
 The "Calculate Gravitational Wave Strain" button should prompt a response to be filled into its corresponding box, but it should also pull up a note in the middle of the page that discusses what the Strain they got means. This specific content should be read:
 
-"The typical residual effect for the black hole binary you've entered is _____. Typical residual precision in the PTA is currently around 100ns, and in the future we expect it to be as low as 10ns. If your number is very far below these, it is unlikely to be detectable by Pulsar Timing Array in the near future. Please also see the graphical output that shows probability of detection given the particular location of the black hole binary on the sky."
-
-There will be an accompanying graph that is outputed with this result.
+"In a typical pulsar, the residual effect produced by the black hole binary you've entered is ____. 
+The current PTA can detect deviations around 100ns, and in the future we expect to reach 10ns. If your number is very far below these, it is unlikely to be detectable by Pulsar Timing Array in the near future. Please also see the graphical output that shows the 
+confidence with which we can rule out this gravitational wave source in the current data set 
+ given its location on the sky."
 
 At the bottom of the page should be the buttons that take them to the other pages on our web site:
 
