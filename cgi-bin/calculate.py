@@ -9,7 +9,9 @@ import scipy.constants as const
 import healpy as hp
 from astropy.coordinates import SkyCoord
 from astropy.cosmology import WMAP5
-#from skymap_class import Skymap
+import os
+from scipy.interpolate import interp1d
+from skymap_class import Skymap
 
 sys.stderr = sys.stdout
 cgitb.enable()
@@ -65,7 +67,7 @@ try:
 
         orbital_p = float(form.getfirst("orbital_p",""))
         total_m = float(form.getfirst("total_m",""))
-        orbital_s = 2*np.cbrt((const.G * M0_to_kg(total_m) * yrs_to_s(orbital_p)**2)/(4*(const.pi)**2))
+        orbital_s = round(m_to_pc(2*np.cbrt((const.G * M0_to_kg(total_m) * yrs_to_s(orbital_p)**2)/(4*(const.pi)**2))), 2)
 
         print(json.dumps({'orbital_s':orbital_s}))
 
@@ -81,7 +83,7 @@ try:
         
         orbital_p = float(form.getfirst("orbital_p",""))
         orbital_s = float(form.getfirst("orbital_s",""))
-        total_m = kg_to_M0((4*(const.pi**2)*(pc_to_m(orbital_s/2))**3)/(const.G * (yrs_to_s(orbital_p))**2))
+        total_m = round(float(kg_to_M0((4*(const.pi**2)*(pc_to_m(orbital_s/2))**3)/(const.G * (yrs_to_s(orbital_p))**2))), 4)
 
         print(json.dumps({'total_m':total_m}))
 
@@ -107,53 +109,16 @@ try:
         #coords = SkyCoord(position_ra, dec_hours, frame = 'icrs')
         
         RA_hours = position_ra.replace('h',',').replace('m',',').replace('s', ',').split(',')
-        phi = float(position_dec)
-        theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
+        input_phi = float(position_dec)
+        input_theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
         
         result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
-	
-        class skymap:
-            def __init__(self, ulfile, pixelfile):
-                assert(type(ulfile) == str and type(pixelfile) == str)
-                assert(os.path.isfile(ulfile) and os.path.isfile(pixelfile))
-                
-                ul = np.loadtxt(ulfile)i
-                pixel = np.genfromtxt(pixelfile, names = True)
-                
-                self.theta = pixel['theta']
-                self.phi = pixel['phi']
-                
-                self.map_dictionary = {}
-                self.map_dictionary[95] = self.create_map(ul[:,1])
-                self.map_dictionary[75] = self.create_map(ul[:,2])
-                self.map_dictionary[50] = self.create_map(ul[:,3])
-                self.map_dictionary[25] = self.create_map(ul[:,4])
-                self.map_dictionary[1] = self.create_map(ul[:,5])
-            
-            def create_map(self, ulcolumn):
-                npix = len(self.theta)
-                nside = hp.npix2nside(npix)
-                indices = hp.ang2pix(nside, self.theta, self.phi)
-                skymap = np.zeros(npix, dtype=np.float)
-                skymap[indices] += ulcolumn[indices]
-                return skymap
-            
-            def interpolate(self, conf, theta, phi):
-                if conf == 'all':
-                    maps = []
-                    for value in self.map_dictionary.values():
-                        maps.append(hp.pixelfunc.get_interp_val(value, theta, phi))
-                    return maps
-                else:
-                    return hp.pixelfunc.get_interp_val(self.map_dictionary[conf], theta, phi)
-            
-            def plot(self, confidence):
-                hp.mollview(np.log10(self.map_dictionary[confidence]), title= 'Upper Limit Skymap')
-        skymap3nHz = skymap('uls_smoothed_3nHz.txt', 'skymap_pixels.txt')
-        skymap10nHz = skymap('uls_smoothed_10nHz.txt', 'skymap_pixels.txt')
-        skymap31nHz = skymap('uls_smoothed_31nHz.txt','skymap_pixels.txt')
-        skymap100nHz = skymap('uls_smoothed_100nHz.txt','skymap_pixels.txt')
-        skymap318nHz = skymap('uls_smoothed_318nHz.txt','skymap_pixels.txt')
+
+        skymap3nHz = Skymap('../cw_maps_database/uls_smoothed_3nHz.txt', '../cw_maps_database/skymap_pixels.txt')
+        skymap10nHz = Skymap('../cw_maps_database/uls_smoothed_10nHz.txt', '../cw_maps_database/skymap_pixels.txt')
+        skymap31nHz = Skymap('../cw_maps_database/uls_smoothed_31nHz.txt','../cw_maps_database/skymap_pixels.txt')
+        skymap100nHz = Skymap('../cw_maps_database/uls_smoothed_100nHz.txt','../cw_maps_database/skymap_pixels.txt')
+        skymap318nHz = Skymap('../cw_maps_database/uls_smoothed_318nHz.txt','../cw_maps_database/skymap_pixels.txt')
 
         interp3nHz= np.array(skymap3nHz.interpolate('all', input_theta, input_phi))
         interp10nHz = np.array(skymap10nHz.interpolate('all', input_theta, input_phi))
@@ -181,11 +146,11 @@ try:
         combined_rows = np.array([row1, row25, row50, row75, row95])
 
         #freq_interp = interp1d(freq_array, combined)
-        freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic')
-        freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic')
-        freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic')
-        freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic')
-        freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic')
+        freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic', fill_value = 'extrapolate')
+        freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic', fill_value = 'extrapolate')
+        freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic', fill_value = 'extrapolate')
+        freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic', fill_value = 'extrapolate')
+        freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic', fill_value = 'extrapolate')
 
         # = np.array([freq_interp1(input_freq), freq_interp2(input_freq), freq_interp3(input_freq), freq_interp4(input_freq), freq_interp5(input_freq)])
 
@@ -196,11 +161,11 @@ try:
 
         #print(new_freq_rows)
 
-        conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
+        conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic', fill_value = 'extrapolate')
 
-        result_ds = round(float(conf_interp(5e-15)), 4)
+        result_ds = round(float(conf_interp(result_rs*orbital_f)), 4)
 
-        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'phi': phi, 'theta': theta}))
+        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'phi': input_phi, 'theta': input_theta}))
 except:
     print("Content-Type: text/html")
     print("")  
