@@ -2,7 +2,7 @@
 import sys
 import traceback
 import cgi
-import cgitb;
+import cgitb
 import json
 import numpy as np
 import scipy.constants as const
@@ -11,7 +11,7 @@ from astropy.coordinates import SkyCoord
 from astropy.cosmology import WMAP5
 import os
 from scipy.interpolate import interp1d
-from skymap_class import Skymap
+#from .skymap_class import Skymap
 
 sys.stderr = sys.stdout
 cgitb.enable()
@@ -114,6 +114,44 @@ try:
         
         result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
 
+        class Skymap:
+            def __init__(self, ulfile, pixelfile):
+                assert(type(ulfile) == str and type(pixelfile) == str)
+                assert(os.path.isfile(ulfile) and os.path.isfile(pixelfile))
+                
+                ul = np.loadtxt(ulfile)
+                pixel = np.genfromtxt(pixelfile, names = True)
+                
+                self.theta = pixel['theta']
+                self.phi = pixel['phi']
+                
+                self.map_dictionary = {}
+                self.map_dictionary[95] = self.create_map(ul[:,1])
+                self.map_dictionary[75] = self.create_map(ul[:,2])
+                self.map_dictionary[50] = self.create_map(ul[:,3])
+                self.map_dictionary[25] = self.create_map(ul[:,4])
+                self.map_dictionary[1] = self.create_map(ul[:,5])
+            
+            def create_map(self, ulcolumn):
+                npix = len(self.theta)
+                nside = hp.npix2nside(npix)
+                indices = hp.ang2pix(nside, self.theta, self.phi)
+                skymap = np.zeros(npix, dtype=np.float)
+                skymap[indices] += ulcolumn[indices]
+                return skymap
+            
+            def interpolate(self, conf, theta, phi):
+                if conf == 'all':
+                    maps = []
+                    for key in sorted(self.map_dictionary.keys()):
+                        maps.append(hp.pixelfunc.get_interp_val(self.map_dictionary[key], theta, phi))
+                    return maps
+                else:
+                    return hp.pixelfunc.get_interp_val(self.map_dictionary[conf], theta, phi)
+            
+            def plot(self, confidence):
+                hp.mollview(np.log10(self.map_dictionary[confidence]), title= 'Upper Limit Skymap')
+         
         skymap3nHz = Skymap('../cw_maps_database/uls_smoothed_3nHz.txt', '../cw_maps_database/skymap_pixels.txt')
         skymap10nHz = Skymap('../cw_maps_database/uls_smoothed_10nHz.txt', '../cw_maps_database/skymap_pixels.txt')
         skymap31nHz = Skymap('../cw_maps_database/uls_smoothed_31nHz.txt','../cw_maps_database/skymap_pixels.txt')
@@ -146,11 +184,11 @@ try:
         combined_rows = np.array([row1, row25, row50, row75, row95])
 
         #freq_interp = interp1d(freq_array, combined)
-        freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic', fill_value = 'extrapolate')
-        freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic', fill_value = 'extrapolate')
-        freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic', fill_value = 'extrapolate')
-        freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic', fill_value = 'extrapolate')
-        freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic', fill_value = 'extrapolate')
+        freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic')
+        freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic')
+        freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic')
+        freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic')
+        freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic')
 
         # = np.array([freq_interp1(input_freq), freq_interp2(input_freq), freq_interp3(input_freq), freq_interp4(input_freq), freq_interp5(input_freq)])
 
@@ -161,7 +199,7 @@ try:
 
         #print(new_freq_rows)
 
-        conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic', fill_value = 'extrapolate')
+        conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
 
         result_ds = round(float(conf_interp(result_rs*orbital_f)), 4)
 

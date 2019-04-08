@@ -1,10 +1,3 @@
-
-# coding: utf-8
-
-# In[16]:
-
-
-get_ipython().run_line_magic('matplotlib', 'inline')
 import numpy as np
 import healpy as hp
 import pandas as pd
@@ -17,10 +10,6 @@ from mpmath import *
 import matplotlib.pyplot as plt
 import os
 from scipy.interpolate import interp1d
-
-
-# In[21]:
-
 
 class Skymap:
     def __init__(self, ulfile, pixelfile):
@@ -79,10 +68,6 @@ input_strain = 5e-15
 #print(skymap100nHz.interpolate('all', input_theta, input_phi))
 #print(skymap318nHz.interpolate('all', input_theta, input_phi))
 
-
-# In[26]:
-
-
 interp3nHz= np.array(skymap3nHz.interpolate('all', input_theta, input_phi))
 interp10nHz = np.array(skymap10nHz.interpolate('all', input_theta, input_phi))
 interp31nHz = np.array(skymap31nHz.interpolate('all', input_theta, input_phi))
@@ -126,7 +111,7 @@ new_freq_rows = np.array([freq_interp1(input_freq), freq_interp2(input_freq), fr
 
 conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
 
-print(float(conf_interp(input_strain)))
+#print(float(conf_interp(input_strain)))
 
 #confidence_interp = interp1d(new_freq_array,)
 #print(freq_interp2(input_freq))
