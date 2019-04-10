@@ -17,7 +17,6 @@ sys.stderr = sys.stdout
 cgitb.enable()
 
 try:
-    #from astropy import units as u
 
     form = cgi.FieldStorage()
 
@@ -193,7 +192,7 @@ try:
         # = np.array([freq_interp1(input_freq), freq_interp2(input_freq), freq_interp3(input_freq), freq_interp4(input_freq), freq_interp5(input_freq)])
 
 
-        confidence_array = [1, 25, 50, 75, 95]
+        confidence_array = np.array([1, 25, 50, 75, 95])
         orbital_f = 1/(orbital_p*365*24*3600)
         new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
 
@@ -201,9 +200,9 @@ try:
 
         conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
 
-        result_ds = round(float(conf_interp(result_rs*orbital_f)), 4)
+        result_ds = round(float(conf_interp(result_rs*1e-9*orbital_f)), 4)
 
-        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'phi': input_phi, 'theta': input_theta}))
+        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds}))
 except:
     print("Content-Type: text/html")
     print("")  
