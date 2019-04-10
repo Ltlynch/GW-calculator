@@ -12,6 +12,7 @@ from astropy.cosmology import WMAP5
 import os
 from scipy.interpolate import interp1d
 #from .skymap_class import Skymap
+from uuid import uuid4
 
 sys.stderr = sys.stdout
 cgitb.enable()
@@ -201,8 +202,8 @@ try:
         conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
 
         result_ds = round(float(conf_interp(result_rs*1e-9*orbital_f)), 4)
-
-        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds}))
+        PNG_name = uuid4().hex
+        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name}))
 except:
     print("Content-Type: text/html")
     print("")  
