@@ -13,10 +13,10 @@ These maps were generated based on the current data within the pulsar timing arr
 
 
 Next to the first map should read:
-"95% Confidence Upper Limit for a frequency of ______"
+"95% Confidence Upper Limit Strain for a frequency of 10 nHz"
 
 The second map:
-"75% Confidence Upper Limit for a frequency of ______"
+"75% Confidence Upper Limit Strain for a frequency of 10 nHz"
 
 The third:
-"50% Confidence Upper Limit for a frequency of ______"
+"50% Confidence Upper Limit Strain for a frequency of 10 nHz"
