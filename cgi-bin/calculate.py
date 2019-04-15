@@ -99,18 +99,17 @@ try:
         orbital_s = float(form.getfirst("orbital_s",""))
         orbital_i = float(form.getfirst("orbital_i",""))
         orbital_e = float(form.getfirst("orbital_e",""))
-        #TODO figure out how to parse the RAJ string and convert it into phi
         position_ra = form.getfirst("position_ra","")
         position_dec = form.getfirst("position_dec","")
         
-        #hours, minutes = position_dec.split('.')
-        #dec_hours = '+{0}d{1}m'.format(hours, minutes)
+        position_dec = position_dec.replace(chr(176), "d").replace("'", "m").replace('"', "s")
+        coords = SkyCoord(position_ra, position_dec, frame = 'icrs')
         
-        #coords = SkyCoord(position_ra, dec_hours, frame = 'icrs')
+        #RA_hours = position_ra.replace('h',',').replace('m',',').replace('s', ',').split(',')
         
-        RA_hours = position_ra.replace('h',',').replace('m',',').replace('s', ',').split(',')
-        input_phi = float(position_dec)
-        input_theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
+        input_phi = float(coords.dec.degree)
+        #input_theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
+        input_theta = float(coords.ra.degree)
         
         result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
 
@@ -182,28 +181,32 @@ try:
         row95 = np.array(combined_columns[:,4])
 
         combined_rows = np.array([row1, row25, row50, row75, row95])
+        
+        error_text = None
+        try:
+            freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic')
+            freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic')
+            freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic')
+            freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic')
+            freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic')
 
-        #freq_interp = interp1d(freq_array, combined)
-        freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic')
-        freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic')
-        freq_interp3 = interp1d(freq_array, combined_rows[2], kind = 'cubic')
-        freq_interp4 = interp1d(freq_array, combined_rows[3], kind = 'cubic')
-        freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic')
-
-        # = np.array([freq_interp1(input_freq), freq_interp2(input_freq), freq_interp3(input_freq), freq_interp4(input_freq), freq_interp5(input_freq)])
-
-
-        confidence_array = np.array([1, 25, 50, 75, 95])
-        orbital_f = 1/(orbital_p*365*24*3600)
-        new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
-
-        #print(new_freq_rows)
-
-        conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
-
-        result_ds = round(float(conf_interp(result_rs*1e-9*orbital_f)), 4)
+            confidence_array = np.array([1, 25, 50, 75, 95])
+            orbital_f = 1/(orbital_p*365*24*3600)
+            new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
+            try:
+                conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
+                result_ds = round(float(conf_interp(result_rs*1e-9*orbital_f)), 4)
+            except Exception as e:
+                if e == 'ValueError':
+                    error_text = "The values input yield a strain that would be undetectable to pulsar timing arrays. If you're testing it out, try adding more mass or decreasing the distance to the source in order to get an upper limit significance plot."
+                result_ds = 0
+            
+        except Exception as e:
+            if e == 'ValueError':
+                error_text = "The frequency you entered does not fall within the boundaries of our current data set. Please select another frequency."
+                result_ds = 0
         PNG_name = uuid4().hex
-        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name}))
+        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text}))
 except:
     print("Content-Type: text/html")
     print("")  

@@ -1,5 +1,4 @@
 #!/usr/bin/env python36
-from __future__ import print_function, division
 # coding: utf-8
 
 # # Calculations for the GravCalc game
@@ -37,7 +36,6 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from PyAstronomy import pyasl    # You'll need to pip install PyAstronomy
 # Set number of residual points
 # 10 years of data, with residuals every 3 weeks
 cadence = 21  # number of days between data points
@@ -46,28 +44,6 @@ cpc = 9.71561e-9 # speed of light in pc per second
 
 
 # In[2]:
-
-def pixel2radec(xs, ys, xlim, ylim):
-    '''Function takes two arrays, horizontal
-    pixel locations (xs) and vertical pixel
-    locations (ys) and returns two arrays, right
-    ascensions and declinations in radians. The upper left
-    pixel number is labeled 0,0. Upper right 
-    is xlim,0. Lower left is 0,ylim. '''
-    ras = []
-    decs = []
-    for i in range(len(xs)):
-        pixelx = float(xs[i])
-        pixely = float(ys[i])
-        # Scale and shift the input arrays so that xmin, xmax= -180,180
-        # and ymin, ymax = -90,90
-        x = (pixelx * 360/xlim) -180 
-        y = 90 - (pixely * 180/ylim)
-        (ra, dec) = pyasl.inverseAitoff(x, y)
-        ras.append(ra*np.pi/180.)
-        decs.append(dec*np.pi/180.)
-
-    return ras, decs
 
 
 def calc_hdamp(gwra, gwdec, pra, pdec):
@@ -150,6 +126,11 @@ def sum_BHBs(ras, decs, periods, totalmasses, distances, cadence, lengthofdata):
 
 # In[6]:
 
+
+# David, these arrays would be populated by user input, in this
+# case the user moving around the binary black holes on the game
+# board
+
 sys.stderr = sys.stdout
 cgitb.enable()
 
@@ -164,15 +145,41 @@ try:
 
     xs = form.getlist("xs") # x coords of points (from top left 0,0)
     ys = form.getlist("ys") # y coords of points (from top left 0,0)
-    w = int(form.getfirst("w")) # height of the map image/projection
-    h = int(form.getfirst("h")) # width of the map image/projection
+    w = form.getfirst("w") # height of the map image/projection
+    h = form.getfirst("h") # width of the map image/projection
 
-    ras, decs = pixel2radec(xs,ys,w,h)
+    # print("Content-Type: application/json")
+    # print("Access-Control-Allow-Origin: *")
+    # print("")
+    # print(json.dumps(xs))
 
+    # conversion functions
+    def cart2pol(x, y):
+        rho = np.sqrt(x**2 + y**2)
+        phi = np.arctan2(y, x)
+        return(rho, phi)
+
+    def pol2cart(rho, phi):
+        x = rho * np.cos(phi)
+        y = rho * np.sin(phi)
+        return(x, y)
+
+    ras_input = []
+    decs_input = []
     for i in range(len(xs)):
+        rho, phi = cart2pol(float(xs[i]),float(ys[i]))
         periods_input[i] = float(periods_input[i])
         totalmasses_input[i] = float(totalmasses_input[i])
         distances_input[i] = float(distances_input[i])
+        ras_input.append(math.radians(phi))
+        decs_input.append(rho)
+
+    # todo ras and decs ?
+
+    # These first two (ras and decs) are created by the position that the user places
+    # the black hole. They are the longitude and latitude on the sky.
+    ras = np.array(ras_input)
+    decs = np.array(decs_input)  # in radians
 
     # These next three (period, totalmass, distance) are input by 
     # which little bubbles the user chooses to drag
@@ -180,7 +187,10 @@ try:
     totalmasses = np.array(totalmasses_input) #in solarmasses
     distances = np.array(distances_input) #in Mpc
 
+
     # In[7]:
+
+
 
     def func(x, a, b, c):
         return a * x**2 + b*x + c
@@ -201,49 +211,36 @@ try:
 
     # In[10]:
 
-    returnValue = 'values' # to return values for charting
-    # returnValue = 'images' # to write & return image files
+    # Random filenames
+    from datetime import datetime
+    stamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    before = '../game/before' + stamp + '.png'
+    after = '../game/after' + stamp + '.png'
 
-    if(returnValue == 'images'):
+    # This is sort of what we would like the plots to look like
+    plt.plot(time, res)
+    plt.ylabel("Residual in ns")
+    plt.xlabel("Time in days")
+    plt.title("Residuals prior to pulsar model fitting")
+    plt.savefig(before);
 
-        # Random filenames
-        from datetime import datetime
-        stamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        before = '../game/before' + stamp + '.png'
-        after = '../game/after' + stamp + '.png'
+    plt.plot(time, subtracted_res)
+    plt.ylabel("Residual in ns")
+    plt.xlabel("Time in days")
+    plt.title("Residuals after pulsar model fitting")
+    plt.savefig(after);
 
-        # This is sort of what we would like the plots to look like
-        plt.plot(time, res)
-        plt.ylabel("Residual in ns")
-        plt.xlabel("Time in days")
-        plt.title("Residuals prior to pulsar model fitting")
-        plt.savefig(before);
+    # File permissions
+    import os;
+    os.chmod(before, 0o755)
+    os.chmod(after, 0o755)
 
-        plt.plot(time, subtracted_res)
-        plt.ylabel("Residual in ns")
-        plt.xlabel("Time in days")
-        plt.title("Residuals after pulsar model fitting")
-        plt.savefig(after);
+    # Print filenames for the ajax request on the frontend
 
-        # File permissions
-        import os;
-        os.chmod(before, 0o755)
-        os.chmod(after, 0o755)
-
-        # Print filenames for the ajax request on the frontend
-        print("Content-Type: application/json")
-        print("Access-Control-Allow-Origin: *")
-        print("")
-        print(json.dumps({'images':[before,after]}))
-
-    if(returnValue == 'values'):
-
-        timeArr = time.tolist()
-        resArr = subtracted_res.tolist()
-        print("Content-Type: application/json")
-        print("Access-Control-Allow-Origin: *")
-        print("")
-        print(json.dumps({'time':timeArr, 'subtracted_res':resArr }))
+    print("Content-Type: application/json")
+    print("Access-Control-Allow-Origin: *")
+    print("")
+    print(json.dumps({'images':[before,after]}))
 
 except:
     print("Content-Type: text/html")
