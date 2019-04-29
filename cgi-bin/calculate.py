@@ -14,6 +14,10 @@ import os
 from scipy.interpolate import interp1d
 #from .skymap_class import Skymap
 from uuid import uuid4
+import matplotlib.pyplot as plt
+import matplotlib.axes as ax
+#sys.path.append("/home/blackhole/public_html/cgi-bin")
+#import plot.py
 
 sys.stderr = sys.stdout
 cgitb.enable()
@@ -129,7 +133,7 @@ try:
         #input_theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
         input_theta = float(coords.ra.degree)
         
-        result_rs = 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
+        result_rs = 10e-3 * 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
 
         class Skymap:
             def __init__(self, ulfile, pixelfile):
@@ -212,10 +216,11 @@ try:
 
             confidence_array = np.array([1, 25, 50, 75, 95])
             orbital_f = 1/(orbital_p*365*24*3600)
+            result_strain = result_rs*1e-6*orbital_f
             new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
             try:
                 conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
-                result_ds = round(float(conf_interp(result_rs*1e-9*orbital_f)), 4)
+                result_ds = round(float(conf_interp(result_strain)), 4)
                 
                 ax = plt.subplot(111, projection="astro mollweide")
                 ax.grid()
@@ -227,23 +232,29 @@ try:
                 plt.suptitle('95% Characteristic Strain Upper Limit, $\log_{10}{h_{95}}$', y=0.0)
                 plt.grid(linestyle='dotted', color='k')
                 plt.tight_layout()
+                
                 PNG_name = uuid4().hex
                 
                 plt.savefig('../output_maps/{}.svg'.format(PNG_name), dpi=800, format= 'svg')
  
             except Exception as e:
-                if e == 'ValueError':
-                    error_text = "The values input yield a strain that would be undetectable to pulsar timing arrays. If you're testing it out, try adding more mass or decreasing the distance to the source in order to get an upper limit significance plot."
-                result_ds = None
-                PNG_name = None
-            
-        except Exception as e:
-            if e == 'ValueError':
-                error_text = "The frequency you entered does not fall within the boundaries of our current data set. Please select another frequency."
-                result_ds = None
-                PNG_name = None
- 
-        print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text}))
+                if result_strain < min(new_freq_rows):
+                    error_text = "The values input yield a strain that would be to small to be detectable by pulsar timing arrays. If you're testing it out, try adding more mass or decreasing the distance to the source in order to get an upper limit significance plot."
+                    result_ds = 0
+                    #TODO Choose the 1 percent significance plot for the corresponding frequency
+                    PNG_name = None
+                elif result_strain > max(new_freq_rows):
+                    #TODO Choose the 95 percent significance plot for the corresponding frequency
+                    error_text = "The values input yield a strain above the 95% confidence level. If this source exists, the it should have already appeared in the NANOGrav dataset."
+                    result_ds = 100
+                    PNG_name = None
+                else:
+                    error_text = str(e)
+        except ValueError:
+            error_text = "The frequency you entered does not fall within the boundaries of our current data set. Please select another frequency."
+            result_ds = None
+            PNG_name = None
+        print(json.dumps({'result_strain':result_strain,'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text}))
 except:
     print("Content-Type: text/html")
     print("")  
