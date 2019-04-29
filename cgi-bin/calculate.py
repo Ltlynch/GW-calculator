@@ -2,6 +2,7 @@
 import sys
 import traceback
 import cgi
+import math
 import cgitb
 import json
 import numpy as np
@@ -100,9 +101,26 @@ try:
         orbital_i = float(form.getfirst("orbital_i",""))
         orbital_e = float(form.getfirst("orbital_e",""))
         position_ra = form.getfirst("position_ra","")
+        ra_hrs = form.getfirst("ra_hrs","")
+        ra_min = form.getfirst("ra_min","")
+        ra_sec = form.getfirst("ra_sec","")
         position_dec = form.getfirst("position_dec","")
+        dec_deg = form.getfirst("dec_deg","")
+        dec_min = form.getfirst("dec_min","")
+        dec_sec = form.getfirst("dec_sec","")
+        ra_opt = form.getfirst("ra_opt","")
+        dec_opt = form.getfirst("dec_opt","")
         
-        position_dec = position_dec.replace(chr(176), "d").replace("'", "m").replace('"', "s")
+        # get which format the user wants to use for RA/Dec
+        if(ra_opt == 'decimal'):
+            position_ra = position_ra + ' hours'
+        elif(ra_opt == 'hours'):
+            position_ra = ra_hrs + 'h' + ra_min + 'm' + ra_sec + 's'
+        if(dec_opt == 'decimal'):
+            position_dec = position_dec + ' degrees'
+        elif(dec_opt == 'degrees'):
+            position_dec = dec_deg + 'd' + dec_min + 'm' + dec_sec + 's'
+
         coords = SkyCoord(position_ra, position_dec, frame = 'icrs')
         
         #RA_hours = position_ra.replace('h',',').replace('m',',').replace('s', ',').split(',')
@@ -183,6 +201,8 @@ try:
         combined_rows = np.array([row1, row25, row50, row75, row95])
         
         error_text = None
+        result_ds = None
+        PNG_name = None
         try:
             freq_interp1 = interp1d(freq_array, combined_rows[0], kind = 'cubic')
             freq_interp2 = interp1d(freq_array, combined_rows[1], kind = 'cubic')
@@ -196,16 +216,33 @@ try:
             try:
                 conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
                 result_ds = round(float(conf_interp(result_rs*1e-9*orbital_f)), 4)
+                
+                ax = plt.subplot(111, projection="astro mollweide")
+                ax.grid()
+                plot.outline_text(ax)
+
+                plot.healpix_heatmap(np.log10(skymap3nHz.map_dictionary[95]), cmap='viridis_r')
+                ax.scatter(math.radians(input_phi), np.pi/2. - math.radians(input_theta), marker='o', s=40, color='orangered', linewidths=1.0, edgecolors='k', zorder=8)
+                plt.colorbar(orientation='horizontal')
+                plt.suptitle('95% Characteristic Strain Upper Limit, $\log_{10}{h_{95}}$', y=0.0)
+                plt.grid(linestyle='dotted', color='k')
+                plt.tight_layout()
+                PNG_name = uuid4().hex
+                
+                plt.savefig('../output_maps/{}.svg'.format(PNG_name), dpi=800, format= 'svg')
+ 
             except Exception as e:
                 if e == 'ValueError':
                     error_text = "The values input yield a strain that would be undetectable to pulsar timing arrays. If you're testing it out, try adding more mass or decreasing the distance to the source in order to get an upper limit significance plot."
-                result_ds = 0
+                result_ds = None
+                PNG_name = None
             
         except Exception as e:
             if e == 'ValueError':
                 error_text = "The frequency you entered does not fall within the boundaries of our current data set. Please select another frequency."
-                result_ds = 0
-        PNG_name = uuid4().hex
+                result_ds = None
+                PNG_name = None
+ 
         print(json.dumps({'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text}))
 except:
     print("Content-Type: text/html")

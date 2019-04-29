@@ -40,7 +40,7 @@ from scipy.optimize import curve_fit
 from PyAstronomy import pyasl    # You'll need to pip install PyAstronomy
 # Set number of residual points
 # 10 years of data, with residuals every 3 weeks
-cadence = 21  # number of days between data points
+cadence = 1  # number of days between data points
 lengthofdata = 10*365.25 # days 
 cpc = 9.71561e-9 # speed of light in pc per second
 
@@ -143,7 +143,7 @@ def sum_BHBs(ras, decs, periods, totalmasses, distances, cadence, lengthofdata):
         hdamp=calc_hdamp(ras[i], decs[i], pra, pdec)
         # these positions are all expected in radians
         resid_amp=calc_resid(totalmasses[i], periods[i], distances[i])
-        x,res=create_sine(hdamp*resid_amp, periods[i]*365.25, cadence, lengthofdata)
+        x,res=create_sine(hdamp*resid_amp, periods[i]*365.25/2., cadence, lengthofdata)
         resids += res
     return x, resids
 
@@ -179,6 +179,12 @@ try:
     periods = np.array(periods_input)  #these are in years
     totalmasses = np.array(totalmasses_input) #in solarmasses
     distances = np.array(distances_input) #in Mpc
+
+    # if the longest period is less than two years
+    # set the range of the graph to 5x the longest period
+    longestPeriod = max(periods_input)
+    if(longestPeriod < 2):
+        lengthofdata = longestPeriod * 5 * 365.25;
 
     # In[7]:
 
