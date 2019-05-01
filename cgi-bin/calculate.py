@@ -244,7 +244,7 @@ else:
             gne = PMgfunc(n,orbital_e)
             n_max = np.argmax(gne) + 1
             # Calculate strain for that harmonic
-            result_strain = (result_rs/ecc_res) * 1e-6 * (orbital_f/n_max) * np.sqrt(PMgfunc(n_max,orbital_e))
+            result_strain = (result_rs/ecc_res) * 1e-6 * orbital_f * np.sqrt(PMgfunc(n_max,orbital_e))
         else:
             result_strain = result_rs*1e-6*orbital_f
             
