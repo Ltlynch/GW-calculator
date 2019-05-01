@@ -234,7 +234,7 @@ else:
             #TODO make colorbar an axes
             cb = plt.colorbar(orientation='horizontal')
             cb.ax.tick_params(labelcolor = 'w', color = 'w')
-            plt.suptitle('{0}% Characteristic Strain Upper Limit at {1}Hz'.format(closest_conf, closest_freq), y=0.05, color='w')
+            plt.suptitle('{0}% Characteristic Strain Upper Limit at {1}Hz, '.format(closest_conf, closest_freq) + '$\log_{{10}}h_{{{0}}}$'.format(closest_conf), y=0.05, color='w')
             plt.grid(linestyle='dotted', color='k') 
             plt.tight_layout()
             PNG_name = uuid4().hex
