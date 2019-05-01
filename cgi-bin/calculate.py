@@ -166,18 +166,20 @@ else:
         
         def plot(self, confidence):
             hp.mollview(np.log10(self.map_dictionary[confidence]), title= 'Upper Limit Skymap')
-     
-    skymap3nHz = Skymap('../cw_maps_database/uls_smoothed_3nHz.txt', '../cw_maps_database/skymap_pixels.txt')
-    skymap10nHz = Skymap('../cw_maps_database/uls_smoothed_10nHz.txt', '../cw_maps_database/skymap_pixels.txt')
-    skymap31nHz = Skymap('../cw_maps_database/uls_smoothed_31nHz.txt','../cw_maps_database/skymap_pixels.txt')
-    skymap100nHz = Skymap('../cw_maps_database/uls_smoothed_100nHz.txt','../cw_maps_database/skymap_pixels.txt')
-    skymap318nHz = Skymap('../cw_maps_database/uls_smoothed_318nHz.txt','../cw_maps_database/skymap_pixels.txt')
-
-    interp3nHz= np.array(skymap3nHz.interpolate('all', input_theta, input_phi))
-    interp10nHz = np.array(skymap10nHz.interpolate('all', input_theta, input_phi))
-    interp31nHz = np.array(skymap31nHz.interpolate('all', input_theta, input_phi))
-    interp100nHz = np.array(skymap100nHz.interpolate('all', input_theta, input_phi))
-    interp318nHz = np.array(skymap318nHz.interpolate('all', input_theta, input_phi))
+    
+    # I'm about to make this really gross: basically a dictionary of classes with dictionaries inside. Sorry! Will be fixed later, just has to be done quick.
+    freqdict={
+        3e-9:Skymap('../cw_maps_database/uls_smoothed_3nHz.txt', '../cw_maps_database/skymap_pixels.txt'),
+        10e-9:Skymap('../cw_maps_database/uls_smoothed_10nHz.txt', '../cw_maps_database/skymap_pixels.txt'),
+        31e-9:Skymap('../cw_maps_database/uls_smoothed_31nHz.txt','../cw_maps_database/skymap_pixels.txt'), 
+        100e-9:Skymap('../cw_maps_database/uls_smoothed_100nHz.txt','../cw_maps_database/skymap_pixels.txt'),
+        318e-9:Skymap('../cw_maps_database/uls_smoothed_318nHz.txt','../cw_maps_database/skymap_pixels.txt')
+    }
+    interp3nHz= np.array(freqdict[3e-9].interpolate('all', input_theta, input_phi))
+    interp10nHz = np.array(freqdict[10e-9].interpolate('all', input_theta, input_phi))
+    interp31nHz = np.array(freqdict[31e-9].interpolate('all', input_theta, input_phi))
+    interp100nHz = np.array(freqdict[100e-9].interpolate('all', input_theta, input_phi))
+    interp318nHz = np.array(freqdict[318e-9].interpolate('all', input_theta, input_phi))
 
     combined_columns = np.array([interp3nHz, interp10nHz, interp31nHz, interp100nHz, interp318nHz])
 
@@ -209,7 +211,7 @@ else:
         freq_interp5 = interp1d(freq_array, combined_rows[4], kind = 'cubic')
 
         confidence_array = np.array([1, 25, 50, 75, 95])
-        orbital_f = 1/(orbital_p*365*24*3600)
+        orbital_f = 1/(orbital_p*365.25*24*3600)
         result_strain = result_rs*1e-6*orbital_f
         new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
         try:
@@ -219,19 +221,27 @@ else:
             ax = plt.subplot(111, projection="astro mollweide")
             ax.grid()
             plot.outline_text(ax)
-
-            plot.healpix_heatmap(np.log10(skymap3nHz.map_dictionary[95]), cmap='viridis_r')
-            ax.scatter(math.radians(input_phi), np.pi/2. - math.radians(input_theta), marker='o', s=40, color='orangered', linewidths=1.0, edgecolors='k', zorder=8)
-            plt.colorbar(orientation='horizontal')
-            plt.suptitle('95% Characteristic Strain Upper Limit, $\log_{10}{h_{95}}$', y=0.0)
-            plt.grid(linestyle='dotted', color='k')
-            plt.tight_layout()
             
+            #TODO this is just temporary
+            def find_nearest(array, value):
+                idx = (np.abs(array-value)).argmin()
+                return array[idx]
+            closest_freq = find_nearest(freq_array, orbital_f)
+            closest_conf = find_nearest(confidence_array, result_ds)
+            plot.healpix_heatmap(np.log10(freqdict[closest_freq].map_dictionary[closest_conf]), cmap='viridis_r')
+            #---------------------------
+            ax.scatter(math.radians(input_phi), np.pi/2. - math.radians(input_theta), marker='o', s=40, color='orangered', linewidths=1.0, edgecolors='k', zorder=8)
+            #TODO make colorbar an axes
+            cb = plt.colorbar(orientation='horizontal')
+            cb.ax.tick_params(labelcolor = 'w', color = 'w')
+            plt.suptitle('{0}% Characteristic Strain Upper Limit at {1}Hz'.format(closest_conf, closest_freq), y=0.05, color='w')
+            plt.grid(linestyle='dotted', color='k') 
+            plt.tight_layout()
             PNG_name = uuid4().hex
             
-            plt.savefig('../output_maps/{}.svg'.format(PNG_name), dpi=800, format= 'svg')
+            plt.savefig('../output_maps/{}.svg'.format(PNG_name), dpi=800, format= 'svg', transparent=True)
 
-        except Exception as e:
+        except ValueError as e:
             if result_strain < min(new_freq_rows):
                 error_text = "The values input yield a strain that would be to small to be detectable by pulsar timing arrays. If you're testing it out, try adding more mass or decreasing the distance to the source in order to get an upper limit significance plot."
                 result_ds = 0
@@ -244,8 +254,10 @@ else:
                 PNG_name = None
             else:
                 error_text = str(e)
+        except KeyError as e:
+            error_text = str(e)
     except ValueError:
-        error_text = "The frequency you entered does not fall within the boundaries of our current data set (.09 to 10.5 years). Please select another frequency."
+        error_text = "If you chose a system that is within our period limits (.09 to 10.5 years) you will receive additional information and maps about how sensitive the current NANOGrav PTA is to that source"
         result_ds = None
         PNG_name = None
     print(json.dumps({'result_strain':result_strain,'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text}))
