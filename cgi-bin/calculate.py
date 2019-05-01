@@ -230,8 +230,8 @@ else:
             closest_conf = find_nearest(confidence_array, result_ds)
             plot.healpix_heatmap(np.log10(freqdict[closest_freq].map_dictionary[closest_conf]), cmap='viridis_r')
             #---------------------------
-            ax.scatter(math.radians(input_phi), np.pi/2. - math.radians(input_theta), marker='o', s=40, color='orangered', linewidths=1.0, edgecolors='k', zorder=8)
-            #TODO make colorbar an axes
+            ax.scatter(math.radians(input_phi), math.radians(input_theta), marker='o', s=40, color='orangered', linewidths=1.0, edgecolors='k', zorder=8)
+            #TOD make colorbar an axes
             cb = plt.colorbar(orientation='horizontal')
             cb.ax.tick_params(labelcolor = 'w', color = 'w')
             plt.suptitle('{0}% Characteristic Strain Upper Limit at {1}Hz, '.format(closest_conf, closest_freq) + '$\log_{{10}}h_{{{0}}}$'.format(closest_conf), y=0.05, color='w')
@@ -260,4 +260,4 @@ else:
         error_text = "If you chose a system that is within our period limits (.09 to 10.5 years) you will receive additional information and maps about how sensitive the current NANOGrav PTA is to that source"
         result_ds = None
         PNG_name = None
-    print(json.dumps({'result_strain':result_strain,'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text}))
+    print(json.dumps({'result_strain':result_strain,'result_rs':result_rs,'result_ds':result_ds,'PNG_name':PNG_name,'error_text': error_text,'input_theta':input_theta}))
