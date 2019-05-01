@@ -45,6 +45,12 @@ def kg_to_M0(kg):
 def M0_to_kg(M0):
     return M0*1.98847e30
 
+def nharm(ecc):
+    '''
+    Number of harmonics to calculate for a given eccentricity
+    '''
+    return np.round(10./(1.-ecc)**(3./2.))
+
 def PMgfunc(n,e):
     '''
     Peters & Matthews 1963 - g(n,e) function - Eqn 20
@@ -232,7 +238,16 @@ else:
 
         confidence_array = np.array([1, 25, 50, 75, 95])
         orbital_f = 1/(orbital_p*365.25*24*3600)
-        result_strain = result_rs*1e-6*orbital_f
+        if orbital_e > 0:
+            # find nth harmonic that has the most power
+            n = np.arange(1,nharm(orbital_e)+1)
+            gne = PMgfunc(n,orbital_e)
+            n_max = np.argmax(gne) + 1
+            # Calculate strain for that harmonic
+            result_strain = (result_rs/ecc_res) * 1e-6 * (orbital_f/n_max) * np.sqrt(PMgfunc(n_max,orbital_e))
+        else:
+            result_strain = result_rs*1e-6*orbital_f
+            
         new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
         try:
             conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
