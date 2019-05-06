@@ -6,6 +6,7 @@ import math
 import json
 import numpy as np
 import scipy.constants as const
+import scipy.special as ss
 import healpy as hp
 from astropy.coordinates import SkyCoord
 from astropy.cosmology import WMAP5
@@ -43,6 +44,22 @@ def kg_to_M0(kg):
 
 def M0_to_kg(M0):
     return M0*1.98847e30
+
+def nharm(ecc):
+    '''
+    Number of harmonics to calculate for a given eccentricity
+    '''
+    return np.round(10./(1.-ecc)**(3./2.))
+
+def PMgfunc(n,e):
+    '''
+    Peters & Matthews 1963 - g(n,e) function - Eqn 20
+    n - nth harmonic
+    e - eccentricity
+    '''
+    return (n**4. / 32.) * ( ( ss.jn(n-2,n*e) - 2.0*e*ss.jn(n-1,n*e) + (2.0/n)*ss.jn(n,n*e) + \
+                              2.0*e*ss.jn(n+1,n*e) - ss.jn(n+2,n*e) )**2.0 + (1.-e**2.)*( ss.jn(n-2,n*e) - \
+                              2.0*ss.jn(n,n*e) + ss.jn(n+2,n*e) )**2.0 + (4./(3.*n**2.))*(ss.jn(n,n*e)**2.) )
 
 if action == 'redshiftcalc':
 
@@ -127,7 +144,16 @@ else:
     #input_theta = float(RA_hours[0]) + float(RA_hours[1])/60 + float(RA_hours[2])/3600
     input_theta = float(coords.dec.degree)
     
-    result_rs = 10e-3 * 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * np.sqrt(1 - (orbital_e)**2) * (1 + np.cos(orbital_i**2))/2
+    if orbital_e == 0:
+        ecc_res = 1
+    elif 0 < orbital_e <= 0.4:
+        ecc_res = np.sqrt(PMgfunc(2,orbital_e))
+    elif orbital_e > 0.4:
+        # Need to adjust pre-factor by a factor of two since this calculation is for the first harmonic, 
+        # not the second (which is the standard for circular systems)
+        ecc_res = np.sqrt(PMgfunc(1,orbital_e)) * 2
+        
+    result_rs = 10e-3 * 190 * (((total_m)/10e9)**(5./3.)) * ((orbital_p)**(1./3.)) * (100/distance) * (m_ratio/((1 + m_ratio))**2) * (1 + np.cos(orbital_i**2))/2 * ecc_res
 
     class Skymap:
         def __init__(self, ulfile, pixelfile):
@@ -212,7 +238,16 @@ else:
 
         confidence_array = np.array([1, 25, 50, 75, 95])
         orbital_f = 1/(orbital_p*365.25*24*3600)
-        result_strain = result_rs*1e-6*orbital_f
+        if orbital_e > 0:
+            # find nth harmonic that has the most power
+            n = np.arange(1,nharm(orbital_e)+1)
+            gne = PMgfunc(n,orbital_e)
+            n_max = np.argmax(gne) + 1
+            # Calculate strain for that harmonic
+            result_strain = (result_rs/ecc_res) * 1e-6 * orbital_f * np.sqrt(PMgfunc(n_max,orbital_e))
+        else:
+            result_strain = result_rs*1e-6*orbital_f
+            
         new_freq_rows = np.array([freq_interp1(orbital_f), freq_interp2(orbital_f), freq_interp3(orbital_f), freq_interp4(orbital_f), freq_interp5(orbital_f)])
         try:
             conf_interp = interp1d(new_freq_rows, confidence_array, kind='cubic')
